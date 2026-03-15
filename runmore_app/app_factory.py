@@ -9,7 +9,6 @@ from flask import (
 )
 from sqlalchemy import or_, and_
 from werkzeug.security import generate_password_hash, check_password_hash
-from jinja2 import ChoiceLoader, FileSystemLoader
 
 from .extensions import db
 from .models import (
@@ -29,26 +28,7 @@ load_dotenv()
 
 # =========================
 def create_app():
-    package_root = os.path.dirname(__file__)
-    repo_root = os.path.abspath(os.path.join(package_root, ".."))
-
-    template_candidates = [
-        os.path.join(repo_root, "templates"),
-        os.path.join(os.getcwd(), "templates"),
-        os.path.join(package_root, "templates"),
-    ]
-    template_paths = []
-    for path in template_candidates:
-        if path not in template_paths and os.path.isdir(path):
-            template_paths.append(path)
-
-    app = Flask(
-        __name__,
-        template_folder=(template_paths[0] if template_paths else "templates"),
-    )
-
-    if len(template_paths) > 1:
-        app.jinja_loader = ChoiceLoader([FileSystemLoader(path) for path in template_paths])
+    app = Flask(__name__)
     app.secret_key = os.getenv("FLASK_SECRET_KEY", "dev-secret-change-me")
 
     app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv("DATABASE_URL", "sqlite:///app.db")
