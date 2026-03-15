@@ -1,0 +1,238 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>RunMore — {{ user.username }}</title>
+  <style>
+    :root{--bg:#0b1220;--text:#e8eefc;--muted:#aab7d8;--border:rgba(255,255,255,.10);--shadow:0 16px 40px rgba(0,0,0,.35);--radius:18px}
+    *{box-sizing:border-box}
+    body{margin:0;min-height:100vh;font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial;color:var(--text);background:
+      radial-gradient(900px 500px at 20% -10%, rgba(124,92,255,.45), transparent 60%),
+      radial-gradient(700px 450px at 110% 10%, rgba(34,197,94,.25), transparent 55%),
+      radial-gradient(800px 600px at 50% 120%, rgba(56,189,248,.18), transparent 60%),var(--bg);
+      padding:28px 16px;display:flex;justify-content:center}
+    .shell{width:100%;max-width:1100px}
+    .topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+    .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+    .grid{display:grid;grid-template-columns:1.25fr .75fr;gap:16px}
+    @media (max-width:980px){.grid{grid-template-columns:1fr}}
+    .btn{border:0;border-radius:14px;padding:10px 12px;font-weight:900;color:#081022;background:linear-gradient(135deg, rgba(124,92,255,1), rgba(34,197,94,.95));cursor:pointer;text-decoration:none}
+    .btn-danger{border:1px solid rgba(239,68,68,.35);background:rgba(239,68,68,.12);color:rgba(255,255,255,.92);padding:8px 10px;border-radius:12px;font-weight:800;cursor:pointer}
+    .btn-ghost{border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.06);color:rgba(232,238,252,.95);padding:9px 12px;border-radius:14px;cursor:pointer;font-weight:700}
+    .card{background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:22px;backdrop-filter:blur(10px);margin-bottom:16px}
+    h1{margin:0 0 6px;font-size:22px}
+    .subtitle{margin:0;color:var(--muted);font-size:13.5px;line-height:1.45}
+    .msg{border-radius:14px;padding:10px 12px;margin:0 0 12px 0;border:1px solid rgba(255,255,255,.12);font-size:13px}
+    .msg.error{background:rgba(239,68,68,.12);border-color:rgba(239,68,68,.22)}
+    .msg.success{background:rgba(34,197,94,.12);border-color:rgba(34,197,94,.22)}
+    .kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:14px}
+    @media (max-width:640px){.kpis{grid-template-columns:1fr}}
+    .kpi{border:1px solid rgba(255,255,255,.10);background:rgba(255,255,255,.04);border-radius:16px;padding:12px}
+    .kpi .label{color:var(--muted);font-size:12px}
+    .kpi .value{font-weight:900;font-size:18px;margin-top:4px}
+    label{font-size:12px;color:var(--muted);display:block;margin:0 0 6px}
+    .field{width:100%;padding:12px;border-radius:14px;border:1px solid rgba(255,255,255,.12);background:rgba(5,10,22,.35);color:var(--text);outline:none}
+    .formgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px}
+    @media (max-width:740px){.formgrid{grid-template-columns:1fr}}
+    .calendar{display:flex;gap:6px;align-items:flex-start;overflow-x:auto;padding-bottom:6px;margin-top:12px}
+    .week{display:grid;grid-template-rows:repeat(7,12px);gap:4px}
+    .cell{width:12px;height:12px;border-radius:3px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.04);position:relative}
+    .lvl0{background:rgba(255,255,255,.04)}
+    .lvl1{background:rgba(34,197,94,.25)}
+    .lvl2{background:rgba(34,197,94,.45)}
+    .lvl3{background:rgba(34,197,94,.72)}
+    .empty{opacity:.25;border-style:dashed}
+    .frozen::after{content:"";position:absolute;inset:-1px;border:1px solid rgba(124,92,255,.8);border-radius:3px}
+    table{width:100%;border-collapse:collapse;margin-top:12px}
+    th,td{padding:10px 8px;border-bottom:1px solid rgba(255,255,255,.08);font-size:13.5px}
+    th{color:rgba(170,183,216,.95);font-weight:700;text-align:left}
+    .chip{display:inline-block;padding:6px 10px;border-radius:999px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.06);color:rgba(232,238,252,.9);font-size:12px}
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <div class="topbar">
+      <div class="row">
+        <a class="btn" href="{{ url_for('home_page') }}">Home</a>
+        <a class="btn" href="{{ url_for('friends_page') }}">Friends</a>
+        <a class="btn" href="{{ url_for('people_search_page') }}">Search people</a>
+        <a class="btn" href="{{ url_for('inbox_page') }}">Inbox</a>
+        <a class="btn" href="{{ url_for('challenges_page') }}">Challenges</a>
+      </div>
+      <form method="post" action="{{ url_for('logout') }}">
+        <button class="btn-ghost" type="submit">Logout</button>
+      </form>
+    </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% for category, message in messages %}
+        <div class="msg {{category}}">{{message}}</div>
+      {% endfor %}
+    {% endwith %}
+
+    <div class="grid">
+      <div class="card">
+        <h1>{{ user.username }}’s dashboard</h1>
+        <p class="subtitle">{{ dash.nudge }}</p>
+
+        <div class="kpis">
+          <div class="kpi"><div class="label">Streak</div><div class="value">{{ dash.streak_days }} day(s)</div></div>
+          <div class="kpi"><div class="label">This week</div><div class="value">{{ dash.this_week.runs }} / {{ dash.this_week.goal }}</div></div>
+          <div class="kpi"><div class="label">Weekly km</div><div class="value">{{ dash.this_week.distance_km }}</div></div>
+        </div>
+
+        <div style="margin-top:16px;">
+          <div class="subtitle"><b>Edit weekly goal</b></div>
+          <form method="post" action="{{ url_for('ui_update_goal', username=user.username) }}" class="row" style="margin-top:8px;">
+            <input class="field" style="max-width:200px;" name="weekly_goal_runs" type="number" min="1" max="14" value="{{ dash.user.weekly_goal_runs }}" />
+            <button class="btn" type="submit">Save goal</button>
+          </form>
+        </div>
+
+        <div style="margin-top:16px;">
+          <div class="subtitle"><b>Personal bests</b></div>
+          <div class="kpis" style="margin-top:10px;">
+            <div class="kpi"><div class="label">Longest run</div><div class="value">{{ dash.bests.longest_km }} km</div></div>
+            <div class="kpi"><div class="label">Fastest pace</div><div class="value">{{ dash.bests.fastest_pace }}</div></div>
+            <div class="kpi"><div class="label">Best week</div><div class="value">{{ dash.bests.best_week_runs }} runs • {{ dash.bests.best_week_km }} km</div></div>
+          </div>
+        </div>
+
+        <div style="margin-top:16px;">
+          <div class="subtitle"><b>Last 30 days</b></div>
+          <div class="calendar">
+            {% for col in dash.calendar30.columns %}
+              <div class="week">
+                {% for cell in col.rows %}
+                  {% if cell.level == -1 %}
+                    <div class="cell empty"></div>
+                  {% else %}
+                    <div class="cell lvl{{cell.level}} {% if cell.is_frozen %}frozen{% endif %}" title="{{ cell.date }}"></div>
+                  {% endif %}
+                {% endfor %}
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+
+        <div class="row" style="margin-top:14px;">
+          {% if dash.freeze.available_this_month %}
+            <span class="chip">Freeze available this month</span>
+          {% else %}
+            <span class="chip">Freeze used this month</span>
+          {% endif %}
+          {% if dash.freeze.can_use_today %}
+            <form method="post" action="{{ url_for('ui_use_freeze', username=user.username) }}">
+              <button class="btn" type="submit">Use freeze for yesterday</button>
+            </form>
+          {% endif %}
+        </div>
+      </div>
+
+      <div class="card">
+        <h1>Log a run</h1>
+        <p class="subtitle">Distance + duration will auto-calculate pace.</p>
+
+        <form method="post" action="{{ url_for('ui_log_run', username=user.username) }}">
+          <div class="formgrid">
+            <div>
+              <label>Date (YYYY-MM-DD)</label>
+              <input class="field" id="dateField" name="date" required />
+            </div>
+            <div>
+              <label>Distance (km)</label>
+              <input class="field" id="distField" name="distance_km" required />
+            </div>
+            <div>
+              <label>Duration (minutes)</label>
+              <input class="field" id="durField" name="duration_min" />
+            </div>
+            <div>
+              <label>Mood</label>
+              <select class="field" name="mood">
+                <option value="">—</option>
+                <option value="good">good</option>
+                <option value="meh">meh</option>
+                <option value="tough">tough</option>
+              </select>
+            </div>
+          </div>
+
+          <div id="paceHint" style="margin-top:10px;color:#aab7d8;">Pace: —</div>
+          <button class="btn" type="submit" style="width:100%;margin-top:12px;">Log run</button>
+        </form>
+      </div>
+    </div>
+
+    <div class="card">
+      <h1>Recent runs</h1>
+      {% if runs %}
+        <table>
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Distance</th>
+              <th>Duration</th>
+              <th>Pace</th>
+              <th>Mood</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for r in runs %}
+              <tr>
+                <td>{{ r.run_date }}</td>
+                <td>{{ "%.2f"|format(r.distance_km) }} km</td>
+                <td>{% if r.duration_min %}{{ r.duration_min }} min{% else %}—{% endif %}</td>
+                <td>{{ r.pace_str }}</td>
+                <td>{% if r.mood %}{{ r.mood }}{% else %}—{% endif %}</td>
+                <td class="row">
+                  <a class="btn" href="{{ url_for('ui_edit_run_page', run_id=r.id) }}">Edit</a>
+                  <form method="post" action="{{ url_for('ui_delete_run', run_id=r.id) }}" onsubmit="return confirm('Delete this run?');">
+                    <button class="btn-danger" type="submit">Delete</button>
+                  </form>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      {% else %}
+        <div style="margin-top:10px;color:#aab7d8;">No runs yet.</div>
+      {% endif %}
+    </div>
+  </div>
+
+  <script>
+    (function(){
+      const d = new Date();
+      const yyyy = d.getFullYear();
+      const mm = String(d.getMonth()+1).padStart(2,'0');
+      const dd = String(d.getDate()).padStart(2,'0');
+      const dateField = document.getElementById('dateField');
+      if (dateField && !dateField.value) dateField.value = `${yyyy}-${mm}-${dd}`;
+    })();
+
+    function updatePace(){
+      const dist = parseFloat(document.getElementById('distField').value);
+      const dur = parseFloat(document.getElementById('durField').value);
+      const out = document.getElementById('paceHint');
+
+      if (!dist || !dur || dist <= 0 || dur <= 0){
+        out.textContent = "Pace: —";
+        return;
+      }
+      const pace = dur / dist;
+      let mins = Math.floor(pace);
+      let secs = Math.round((pace - mins) * 60);
+      if (secs === 60) {
+        mins += 1;
+        secs = 0;
+      }
+      out.textContent = `Pace: ${mins}:${String(secs).padStart(2,'0')} /km`;
+    }
+    document.getElementById('distField').addEventListener('input', updatePace);
+    document.getElementById('durField').addEventListener('input', updatePace);
+  </script>
+</body>
+</html>

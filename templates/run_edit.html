@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Edit Run</title>
+  <style>
+    :root{
+      --bg:#0b1220; --text:#e8eefc; --muted:#aab7d8;
+      --border:rgba(255,255,255,.10); --shadow:0 16px 40px rgba(0,0,0,.35);
+      --radius:18px;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0; min-height:100vh;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+      color:var(--text);
+      background:
+        radial-gradient(900px 500px at 20% -10%, rgba(124,92,255,.45), transparent 60%),
+        radial-gradient(700px 450px at 110% 10%, rgba(34,197,94,.25), transparent 55%),
+        radial-gradient(800px 600px at 50% 120%, rgba(56,189,248,.18), transparent 60%),
+        var(--bg);
+      padding:28px 16px;
+      display:flex; justify-content:center;
+    }
+    .shell{width:100%; max-width:720px}
+    .topbar{display:flex; align-items:center; justify-content:space-between; margin-bottom:18px}
+    .crumbs a{
+      color: rgba(232,238,252,.92);
+      text-decoration:none;
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.06);
+      padding:8px 10px;
+      border-radius:12px;
+      margin-right:8px;
+      display:inline-block;
+      font-size:12.5px;
+    }
+    .btn-ghost{
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.06);
+      color: rgba(232,238,252,.95);
+      padding:9px 12px; border-radius:14px;
+      cursor:pointer; font-weight:700;
+    }
+    .card{
+      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+      border:1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding:22px;
+      backdrop-filter: blur(10px);
+    }
+    h1{margin:0 0 6px; font-size:22px}
+    .subtitle{margin:0; color:var(--muted); font-size:13.5px; line-height:1.45}
+    label{font-size:12px; color:var(--muted); display:block; margin:0 0 6px}
+    .field{
+      width:100%;
+      padding:12px;
+      border-radius:14px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(5,10,22,.35);
+      color:var(--text);
+      outline:none;
+    }
+    .formgrid{display:grid; grid-template-columns: 1fr 1fr; gap:12px; margin-top:12px}
+    @media (max-width: 740px){ .formgrid{grid-template-columns:1fr} }
+    .btn{
+      width:100%;
+      border:0; border-radius:14px;
+      padding:12px 14px;
+      font-weight:900;
+      color:#081022;
+      background: linear-gradient(135deg, rgba(124,92,255,1), rgba(34,197,94,.95));
+      cursor:pointer;
+      margin-top:12px;
+    }
+    .msg{
+      border-radius:14px;
+      padding:10px 12px;
+      margin:0 0 12px 0;
+      border:1px solid rgba(255,255,255,.12);
+      font-size:13px;
+    }
+    .msg.error{background: rgba(239,68,68,.12); border-color: rgba(239,68,68,.22);}
+    .msg.success{background: rgba(34,197,94,.12); border-color: rgba(34,197,94,.22);}
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <div class="topbar">
+      <div class="crumbs">
+        <a href="{{ url_for('home_page') }}">Home</a>
+        <a href="{{ url_for('user_page', username=me.username) }}">My dashboard</a>
+      </div>
+      <form method="post" action="{{ url_for('logout') }}">
+        <button class="btn-ghost" type="submit">Logout</button>
+      </form>
+    </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% for category, message in messages %}
+        <div class="msg {{category}}">{{message}}</div>
+      {% endfor %}
+    {% endwith %}
+
+    <div class="card">
+      <h1>Edit run</h1>
+      <p class="subtitle">Update the details and save.</p>
+
+      <form method="post" action="{{ url_for('ui_edit_run_post', run_id=run.id) }}">
+        <div class="formgrid">
+          <div>
+            <label>Date (YYYY-MM-DD)</label>
+            <input class="field" name="date" value="{{ run.run_date.isoformat() }}" required />
+          </div>
+          <div>
+            <label>Distance (km)</label>
+            <input class="field" name="distance_km" value="{{ run.distance_km }}" required />
+          </div>
+          <div>
+            <label>Duration (minutes)</label>
+            <input class="field" name="duration_min" value="{% if run.duration_min %}{{ run.duration_min }}{% endif %}" />
+          </div>
+          <div>
+            <label>Mood</label>
+            <select class="field" name="mood">
+              <option value="" {% if not run.mood %}selected{% endif %}>—</option>
+              <option value="good" {% if run.mood=='good' %}selected{% endif %}>good</option>
+              <option value="meh" {% if run.mood=='meh' %}selected{% endif %}>meh</option>
+              <option value="tough" {% if run.mood=='tough' %}selected{% endif %}>tough</option>
+            </select>
+          </div>
+        </div>
+
+        <button class="btn" type="submit">Save changes</button>
+      </form>
+    </div>
+  </div>
+</body>
+</html>

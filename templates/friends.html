@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>RunMore — Home</title>
+  <style>
+    :root{--bg:#0b1220;--text:#e8eefc;--muted:#aab7d8;--border:rgba(255,255,255,.10);--shadow:0 16px 40px rgba(0,0,0,.35);--radius:18px}
+    *{box-sizing:border-box}
+    body{margin:0;min-height:100vh;font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial;color:var(--text);background:
+      radial-gradient(900px 500px at 20% -10%, rgba(124,92,255,.45), transparent 60%),
+      radial-gradient(700px 450px at 110% 10%, rgba(34,197,94,.25), transparent 55%),
+      radial-gradient(800px 600px at 50% 120%, rgba(56,189,248,.18), transparent 60%),var(--bg);
+      padding:28px 16px;display:flex;justify-content:center}
+    .shell{width:100%;max-width:1150px}
+    .topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+    .brand{display:flex;gap:12px;align-items:center}
+    .logo{width:40px;height:40px;border-radius:14px;background:linear-gradient(135deg, rgba(124,92,255,1), rgba(34,197,94,.9));display:grid;place-items:center;font-weight:800}
+    .brand h1{margin:0;font-size:18px}
+    .brand p{margin:0;color:var(--muted);font-size:12.5px}
+    .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+    .btn,.btn-small{border:0;border-radius:14px;padding:10px 12px;font-weight:900;color:#081022;background:linear-gradient(135deg, rgba(124,92,255,1), rgba(34,197,94,.95));cursor:pointer;text-decoration:none}
+    .btn-ghost{border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.06);color:rgba(232,238,252,.95);padding:9px 12px;border-radius:14px;cursor:pointer;font-weight:700}
+    .btn-danger{border:1px solid rgba(239,68,68,.35);background:rgba(239,68,68,.12);color:rgba(255,255,255,.92);padding:8px 10px;border-radius:12px;font-weight:800;cursor:pointer}
+    .grid{display:grid;grid-template-columns:1.2fr .8fr;gap:16px}
+    @media (max-width:980px){.grid{grid-template-columns:1fr}}
+    .card{background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:22px;backdrop-filter:blur(10px)}
+    .title{margin:0 0 6px;font-size:22px}
+    .subtitle{margin:0;color:var(--muted);font-size:13.5px;line-height:1.45}
+    .msg{border-radius:14px;padding:10px 12px;margin:0 0 12px 0;border:1px solid rgba(255,255,255,.12);font-size:13px}
+    .msg.error{background:rgba(239,68,68,.12);border-color:rgba(239,68,68,.22)}
+    .msg.success{background:rgba(34,197,94,.12);border-color:rgba(34,197,94,.22)}
+    .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:14px}
+    @media (max-width:760px){.kpis{grid-template-columns:1fr 1fr}}
+    @media (max-width:480px){.kpis{grid-template-columns:1fr}}
+    .kpi{border:1px solid rgba(255,255,255,.10);background:rgba(255,255,255,.04);border-radius:16px;padding:12px}
+    .kpi .label{color:var(--muted);font-size:12px}
+    .kpi .value{font-weight:900;font-size:18px;margin-top:4px}
+    .friend-item{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.08)}
+    .chip{display:inline-block;padding:6px 10px;border-radius:999px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.06);color:rgba(232,238,252,.9);font-size:12px}
+    .bar-wrap{margin-top:12px;display:flex;flex-direction:column;gap:10px}
+    .bar-row{display:grid;grid-template-columns:80px 1fr 60px;gap:10px;align-items:center}
+    .bar{height:10px;background:rgba(255,255,255,.08);border-radius:999px;overflow:hidden}
+    .bar-fill{height:100%;background:linear-gradient(135deg, rgba(124,92,255,1), rgba(34,197,94,.95))}
+    a.link{color:#dfe8ff;text-decoration:none}
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <div class="topbar">
+      <div class="brand">
+        <div class="logo">RM</div>
+        <div>
+          <h1>RunMore</h1>
+          <p>Friends, inbox, challenges, analytics</p>
+        </div>
+      </div>
+      <div class="row">
+        <a class="btn" href="{{ url_for('user_page', username=me.username) }}">My dashboard</a>
+        <a class="btn" href="{{ url_for('friends_page') }}">Friends</a>
+        <a class="btn" href="{{ url_for('people_search_page') }}">Search people</a>
+        <a class="btn" href="{{ url_for('inbox_page') }}">Inbox</a>
+        <a class="btn" href="{{ url_for('challenges_page') }}">Challenges</a>
+        <form method="post" action="{{ url_for('logout') }}">
+          <button class="btn-ghost" type="submit">Logout</button>
+        </form>
+      </div>
+    </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% for category, message in messages %}
+        <div class="msg {{category}}">{{message}}</div>
+      {% endfor %}
+    {% endwith %}
+
+    <div class="grid">
+      <div class="card">
+        <h2 class="title">Analytics</h2>
+        <p class="subtitle">Your overall running snapshot and personal bests.</p>
+
+        <div class="kpis">
+          <div class="kpi"><div class="label">Total runs</div><div class="value">{{ analytics.total_runs }}</div></div>
+          <div class="kpi"><div class="label">Total km</div><div class="value">{{ analytics.total_km }}</div></div>
+          <div class="kpi"><div class="label">Avg distance</div><div class="value">{{ analytics.avg_distance }} km</div></div>
+          <div class="kpi"><div class="label">Current streak</div><div class="value">{{ analytics.current_streak }}</div></div>
+          <div class="kpi"><div class="label">Longest run</div><div class="value">{{ analytics.longest_km }} km</div></div>
+          <div class="kpi"><div class="label">Fastest pace</div><div class="value">{{ analytics.fastest_pace }}</div></div>
+          <div class="kpi"><div class="label">Best week</div><div class="value">{{ analytics.best_week_runs }} runs</div></div>
+          <div class="kpi"><div class="label">Active days (30d)</div><div class="value">{{ analytics.active_days_30 }}</div></div>
+        </div>
+
+        <div style="margin-top:18px;">
+          <div class="subtitle"><b>Last 4 weeks</b></div>
+          <div class="bar-wrap">
+            {% for block in analytics.weekly_blocks %}
+              <div class="bar-row">
+                <div class="chip">{{ block.label }}</div>
+                <div class="bar">
+                  <div class="bar-fill" style="width: {{ (block.km / analytics.max_weekly_km * 100) if analytics.max_weekly_km > 0 else 0 }}%;"></div>
+                </div>
+                <div>{{ block.km }} km</div>
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2 class="title">Friends</h2>
+        {% if friends %}
+          {% for friend in friends[:5] %}
+            <div class="friend-item">
+              <a class="link" href="{{ url_for('profile_page', username=friend.username) }}">{{ friend.username }}</a>
+              <span class="chip">Friend</span>
+            </div>
+          {% endfor %}
+          <div style="margin-top:14px;">
+            <a class="btn" href="{{ url_for('friends_page') }}">View all friends →</a>
+          </div>
+        {% else %}
+          <div style="margin-top:10px; color:#aab7d8;">No friends yet.</div>
+          <div style="margin-top:14px;">
+            <a class="btn" href="{{ url_for('people_search_page') }}">Find people →</a>
+          </div>
+        {% endif %}
+
+        {% if pending_received %}
+          <div style="margin-top:18px;">
+            <div class="subtitle"><b>Incoming friend requests</b></div>
+            {% for fr in pending_received[:3] %}
+              <div class="friend-item">
+                <span>{{ from_users[fr.id].username }}</span>
+                <div class="row">
+                  <form method="post" action="{{ url_for('ui_accept_friend_request', request_id=fr.id) }}">
+                    <button class="btn-small" type="submit">Accept</button>
+                  </form>
+                  <form method="post" action="{{ url_for('ui_decline_friend_request', request_id=fr.id) }}">
+                    <button class="btn-danger" type="submit">Decline</button>
+                  </form>
+                </div>
+              </div>
+            {% endfor %}
+            <div style="margin-top:14px;">
+              <a class="btn" href="{{ url_for('inbox_page') }}">Open inbox →</a>
+            </div>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</body>
+</html>

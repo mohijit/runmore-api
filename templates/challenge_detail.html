@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>RunMore — Challenge</title>
+  <style>
+    :root{--bg:#0b1220;--text:#e8eefc;--muted:#aab7d8;--border:rgba(255,255,255,.10);--shadow:0 16px 40px rgba(0,0,0,.35);--radius:18px}
+    *{box-sizing:border-box}
+    body{margin:0;min-height:100vh;font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial;color:var(--text);background:
+      radial-gradient(900px 500px at 20% -10%, rgba(124,92,255,.45), transparent 60%),
+      radial-gradient(700px 450px at 110% 10%, rgba(34,197,94,.25), transparent 55%),
+      radial-gradient(800px 600px at 50% 120%, rgba(56,189,248,.18), transparent 60%),var(--bg);
+      padding:28px 16px;display:flex;justify-content:center}
+    .shell{width:100%;max-width:980px}
+    .topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+    .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+    .btn{border:0;border-radius:14px;padding:10px 12px;font-weight:900;color:#081022;background:linear-gradient(135deg, rgba(124,92,255,1), rgba(34,197,94,.95));cursor:pointer;text-decoration:none}
+    .btn-ghost{border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.06);color:rgba(232,238,252,.95);padding:9px 12px;border-radius:14px;cursor:pointer;font-weight:700}
+    .card{background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:22px;backdrop-filter:blur(10px);margin-bottom:16px}
+    .title{margin:0 0 6px;font-size:22px}
+    .subtitle{margin:0;color:var(--muted);font-size:13.5px;line-height:1.45}
+    table{width:100%;border-collapse:collapse;margin-top:12px}
+    th,td{padding:10px 8px;border-bottom:1px solid rgba(255,255,255,.08);font-size:13.5px}
+    th{color:rgba(170,183,216,.95);font-weight:700;text-align:left}
+    .chip{display:inline-block;padding:6px 10px;border-radius:999px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.06);color:rgba(232,238,252,.9);font-size:12px}
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <div class="topbar">
+      <div class="row">
+        <a class="btn" href="{{ url_for('home_page') }}">Home</a>
+        <a class="btn" href="{{ url_for('challenges_page') }}">Challenges</a>
+        <a class="btn" href="{{ url_for('inbox_page') }}">Inbox</a>
+      </div>
+      <form method="post" action="{{ url_for('logout') }}">
+        <button class="btn-ghost" type="submit">Logout</button>
+      </form>
+    </div>
+
+    <div class="card">
+      <h2 class="title">{{ challenge.challenge_type|capitalize }} challenge</h2>
+      <p class="subtitle">
+        Created by {{ creator.username }} • {{ target_label }}
+      </p>
+      {% if challenge.description %}
+        <div style="margin-top:12px;">{{ challenge.description }}</div>
+      {% endif %}
+      <div style="margin-top:12px;" class="row">
+        {% for user in participant_users %}
+          <span class="chip">{{ user.username }}</span>
+        {% endfor %}
+      </div>
+    </div>
+
+    <div class="card">
+      <h2 class="title">Leaderboard</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Rank</th>
+            <th>User</th>
+            <th>Status</th>
+            <th>Detail</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for row in leaderboard %}
+            <tr>
+              <td>#{{ row.rank }}</td>
+              <td>{{ row.username }}</td>
+              <td>{{ row.display }}</td>
+              <td>{{ row.detail }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</body>
+</html>

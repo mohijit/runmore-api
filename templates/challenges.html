@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>RunMore — Messages with {{ friend.username }}</title>
+  <style>
+    :root{--bg:#0b1220;--text:#e8eefc;--muted:#aab7d8;--border:rgba(255,255,255,.10);--shadow:0 16px 40px rgba(0,0,0,.35);--radius:18px}
+    *{box-sizing:border-box}
+    body{margin:0;min-height:100vh;font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial;color:var(--text);background:
+      radial-gradient(900px 500px at 20% -10%, rgba(124,92,255,.45), transparent 60%),
+      radial-gradient(700px 450px at 110% 10%, rgba(34,197,94,.25), transparent 55%),
+      radial-gradient(800px 600px at 50% 120%, rgba(56,189,248,.18), transparent 60%),var(--bg);
+      padding:28px 16px;display:flex;justify-content:center}
+    .shell{width:100%;max-width:900px}
+    .topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+    .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+    .btn{border:0;border-radius:14px;padding:10px 12px;font-weight:900;color:#081022;background:linear-gradient(135deg, rgba(124,92,255,1), rgba(34,197,94,.95));cursor:pointer;text-decoration:none}
+    .btn-ghost{border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.06);color:rgba(232,238,252,.95);padding:9px 12px;border-radius:14px;cursor:pointer;font-weight:700}
+    .card{background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:22px;backdrop-filter:blur(10px)}
+    .title{margin:0 0 12px;font-size:22px}
+    .message-list{display:flex;flex-direction:column;gap:10px;max-height:420px;overflow:auto;margin-bottom:16px}
+    .bubble{padding:12px;border-radius:14px;max-width:70%}
+    .mine{background:rgba(124,92,255,.30);align-self:flex-end}
+    .theirs{background:rgba(255,255,255,.08);align-self:flex-start}
+    .meta{font-size:11px;color:#aab7d8;margin-top:6px}
+    .field{width:100%;padding:12px;border-radius:14px;border:1px solid rgba(255,255,255,.12);background:rgba(5,10,22,.35);color:var(--text);outline:none}
+    .msg{border-radius:14px;padding:10px 12px;margin:0 0 12px 0;border:1px solid rgba(255,255,255,.12);font-size:13px}
+    .msg.error{background:rgba(239,68,68,.12);border-color:rgba(239,68,68,.22)}
+    .msg.success{background:rgba(34,197,94,.12);border-color:rgba(34,197,94,.22)}
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <div class="topbar">
+      <div class="row">
+        <a class="btn" href="{{ url_for('home_page') }}">Home</a>
+        <a class="btn" href="{{ url_for('friends_page') }}">Friends</a>
+        <a class="btn" href="{{ url_for('profile_page', username=friend.username) }}">View profile</a>
+        <a class="btn" href="{{ url_for('inbox_page') }}">Inbox</a>
+      </div>
+      <form method="post" action="{{ url_for('logout') }}">
+        <button class="btn-ghost" type="submit">Logout</button>
+      </form>
+    </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% for category, message in messages %}
+        <div class="msg {{category}}">{{message}}</div>
+      {% endfor %}
+    {% endwith %}
+
+    <div class="card">
+      <h2 class="title">Conversation with {{ friend.username }}</h2>
+
+      <div class="message-list">
+        {% if messages %}
+          {% for m in messages %}
+            <div class="bubble {% if m.sender_id == me.id %}mine{% else %}theirs{% endif %}">
+              <div>{{ m.body }}</div>
+              <div class="meta">
+                {% if m.sender_id == me.id %}You{% else %}{{ friend.username }}{% endif %}
+                • {{ m.created_at.strftime("%d %b %H:%M") }}
+              </div>
+            </div>
+          {% endfor %}
+        {% else %}
+          <div style="color:#aab7d8;">No messages yet.</div>
+        {% endif %}
+      </div>
+
+      <form method="post" action="{{ url_for('send_message', username=friend.username) }}">
+        <div class="row" style="align-items:flex-start;">
+          <textarea class="field" name="body" rows="3" placeholder="Write a message..."></textarea>
+          <button class="btn" type="submit">Send</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>RunMore — Login</title>
+  <style>
+    :root{
+      --bg:#0b1220;
+      --card:#0f1b33;
+      --card2:#0d1730;
+      --text:#e8eefc;
+      --muted:#aab7d8;
+      --border:rgba(255,255,255,.10);
+      --shadow:0 16px 40px rgba(0,0,0,.35);
+      --accent:#7c5cff;
+      --accent2:#22c55e;
+      --danger:#ef4444;
+      --radius:18px;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      min-height:100vh;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+      color:var(--text);
+      background:
+        radial-gradient(900px 500px at 20% -10%, rgba(124,92,255,.45), transparent 60%),
+        radial-gradient(700px 450px at 110% 10%, rgba(34,197,94,.25), transparent 55%),
+        radial-gradient(800px 600px at 50% 120%, rgba(56,189,248,.18), transparent 60%),
+        var(--bg);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:28px 16px;
+    }
+    .shell{width:100%; max-width:520px}
+    .brand{
+      display:flex; align-items:center; gap:12px;
+      margin-bottom:14px;
+    }
+    .logo{
+      width:42px; height:42px; border-radius:14px;
+      background: linear-gradient(135deg, rgba(124,92,255,1), rgba(34,197,94,.9));
+      box-shadow: 0 12px 30px rgba(124,92,255,.25);
+      display:grid; place-items:center;
+      font-weight:800;
+    }
+    .brand h1{font-size:22px; margin:0; letter-spacing:.2px}
+    .brand p{margin:0; color:var(--muted); font-size:13px}
+    .card{
+      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+      border:1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding:22px;
+      backdrop-filter: blur(10px);
+    }
+    .title{margin:0 0 6px 0; font-size:20px}
+    .subtitle{margin:0 0 16px 0; color:var(--muted); font-size:13.5px; line-height:1.45}
+    .stack{display:flex; flex-direction:column; gap:12px}
+    label{font-size:12px; color:var(--muted); display:block; margin:0 0 6px}
+    .field{
+      width:100%;
+      padding:12px 12px;
+      border-radius:14px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(5,10,22,.35);
+      color:var(--text);
+      outline:none;
+      transition: .18s ease;
+    }
+    .field:focus{
+      border-color: rgba(124,92,255,.7);
+      box-shadow: 0 0 0 4px rgba(124,92,255,.18);
+    }
+    .row{display:flex; gap:10px; align-items:center; justify-content:space-between; margin-top:6px}
+    .btn{
+      width:100%;
+      border:0;
+      border-radius:14px;
+      padding:12px 14px;
+      font-weight:700;
+      color:#081022;
+      background: linear-gradient(135deg, rgba(124,92,255,1), rgba(34,197,94,.95));
+      cursor:pointer;
+      transition: transform .12s ease, filter .12s ease;
+    }
+    .btn:hover{filter:brightness(1.05)}
+    .btn:active{transform: translateY(1px)}
+    .hint{
+      margin-top:12px;
+      color:var(--muted);
+      font-size:12.5px;
+      line-height:1.45;
+    }
+    .msg{
+      border-radius:14px;
+      padding:10px 12px;
+      margin:0 0 12px 0;
+      border:1px solid rgba(255,255,255,.12);
+      font-size:13px;
+    }
+    .msg.error{
+      background: rgba(239,68,68,.12);
+      border-color: rgba(239,68,68,.22);
+    }
+    .msg.success{
+      background: rgba(34,197,94,.12);
+      border-color: rgba(34,197,94,.22);
+    }
+    .foot{
+      margin-top:14px;
+      color:rgba(170,183,216,.75);
+      font-size:12px;
+      text-align:center;
+    }
+    .kbd{
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      font-size:11px;
+      padding:2px 6px;
+      border:1px solid rgba(255,255,255,.14);
+      border-radius:8px;
+      background: rgba(255,255,255,.06);
+      color: rgba(232,238,252,.9);
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <div class="brand">
+      <div class="logo">RM</div>
+      <div>
+        <h1>RunMore</h1>
+        <p>Simple running motivation tracker</p>
+      </div>
+    </div>
+
+    <div class="card">
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% for category, message in messages %}
+          <div class="msg {{category}}">{{message}}</div>
+        {% endfor %}
+      {% endwith %}
+
+      <h2 class="title">Login</h2>
+      <p class="subtitle">
+        New here? Type a username and continue — you’ll set a password next.
+        Existing user? Enter your password and continue.
+      </p>
+
+      <form class="stack" method="post" action="/login" autocomplete="on">
+        <div>
+          <label>Username</label>
+          <input class="field" name="username" placeholder="e.g. mohijit" required />
+        </div>
+
+        <div>
+          <label>Password <span style="opacity:.8">(existing users)</span></label>
+          <input class="field" name="password" type="password" placeholder="••••••••" />
+        </div>
+
+        <button class="btn" type="submit">Continue</button>
+      </form>
+
+      <div class="hint">
+        Tip: aim for <span class="kbd">8–12 minutes</span> on your hard days. Consistency beats intensity.
+      </div>
+    </div>
+
+    <div class="foot">RunMore • built with Flask</div>
+  </div>
+</body>
+</html>
