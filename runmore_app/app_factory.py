@@ -1,5 +1,4 @@
 import os
-from pathlib import Path
 from datetime import datetime, timedelta, date
 from functools import wraps
 
@@ -10,7 +9,6 @@ from flask import (
 )
 from sqlalchemy import or_, and_
 from werkzeug.security import generate_password_hash, check_password_hash
-from jinja2 import ChoiceLoader, FileSystemLoader
 
 from .extensions import db
 from .models import (
@@ -30,33 +28,7 @@ load_dotenv()
 
 # =========================
 def create_app():
-    package_root = Path(__file__).resolve().parent
-    repo_root = package_root.parent
-
-    configured_template_dir = os.getenv("RUNMORE_TEMPLATE_DIR")
-    template_candidates = [
-        str(repo_root / "templates"),
-        str(Path.cwd() / "templates"),
-        str(package_root / "templates"),
-    ]
-    if configured_template_dir:
-        template_candidates.insert(0, configured_template_dir)
-
-    # Keep order, remove duplicates, and include both existing and fallback paths.
-    template_paths = []
-    for path in template_candidates:
-        normalized = os.path.abspath(path)
-        if normalized not in template_paths:
-            template_paths.append(normalized)
-
-    app = Flask(
-        __name__,
-        template_folder=template_paths[0],
-    )
-
-    # Use explicit filesystem template loader so lookup does not depend on package root.
-    app.jinja_loader = ChoiceLoader([FileSystemLoader(path) for path in template_paths])
-
+    app = Flask(__name__)
     app.secret_key = os.getenv("FLASK_SECRET_KEY", "dev-secret-change-me")
 
     app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv("DATABASE_URL", "sqlite:///app.db")
