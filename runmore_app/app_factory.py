@@ -28,11 +28,7 @@ load_dotenv()
 
 # =========================
 def create_app():
-    repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
-    app = Flask(
-        __name__,
-        template_folder=os.path.join(repo_root, "templates"),
-    )
+    app = Flask(__name__)
     app.secret_key = os.getenv("FLASK_SECRET_KEY", "dev-secret-change-me")
 
     app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv("DATABASE_URL", "sqlite:///app.db")
